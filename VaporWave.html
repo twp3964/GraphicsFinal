@@ -2,7 +2,34 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>CSCI-510: Tessellation</title>
+  <title>CSCI-510: Final</title>
+  <!-- vertex Shader -->
+<script id="vertex-shader" type="x-shader/x-vertex">
+  attribute vec4 aVertexPosition;
+  attribute vec3 aVertexColor; // Adding color attribute
+
+  uniform mat4 uModelViewMatrix;
+  uniform mat4 uProjectionMatrix;
+
+  varying vec3 vColor; // Sending color to the fragment shader
+
+  void main() {
+    gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+    vColor = aVertexColor; // Passing color to fragment shader
+  }
+</script>
+
+<!-- fragment Shader -->
+<script id="fragment-shader" type="x-shader/x-fragment">
+  precision mediump float;
+
+  varying vec3 vColor; // Receiving color from the vertex shader
+
+  void main(void) {
+    gl_FragColor = vec4(vColor, 1.0); // Using color received from vertex shader
+  }
+</script>
+
   <style>
     body {
       margin: 0;
@@ -27,71 +54,15 @@
         <table border="1">
           <tbody>
             <tr>
-              <td>x, y, z</td>
-              <td>Rotate the current shape forward about the x, y, or z axis</td>
+              <td>W,A,S,D</td>
+              <td>Move the camera using WASD</td>
             </tr>
-            <!-- Other control descriptions -->
-            <!-- ... -->
           </tbody>
         </table>
       </td>
     </tr>
   </table>
 
-  <script type="text/javascript">
-    function gotKey(event) {
-      var key = event.key;
-
-      // Handle key presses according to your existing logic (removed for brevity)
-      // ...
-
-      // Redraw the shape
-      createNewShape();
-      draw();
-    }
-
-    // Entry point to the application
-    function init() {
-      // Retrieve the canvas
-      const canvas = document.getElementById('webgl-canvas');
-      if (!canvas) {
-        console.error('Canvas not found.');
-        return null;
-      }
-
-      // Deal with keypress
-      window.addEventListener('keydown', gotKey, false);
-
-      // Retrieve a WebGL context
-      const gl = canvas.getContext('webgl2');
-      if (!gl) {
-        console.error('WebGL not supported.');
-        return null;
-      }
-
-      // Set the clear color to solid black
-      gl.clearColor(0, 0, 0, 1);
-
-      // Some GL initialization
-      gl.enable(gl.DEPTH_TEST);
-      gl.enable(gl.CULL_FACE);
-      gl.cullFace(gl.BACK);
-      gl.frontFace(gl.CCW);
-      gl.depthFunc(gl.LEQUAL);
-      gl.clearDepth(1.0);
-
-      // Initialize shaders and other WebGL related operations
-      //initProgram();
-
-      // Create and bind your current object
-      //createNewShape();
-
-      // Perform initial draw
-      draw();
-    }
-
-    // Call init once the webpage has loaded
-    window.onload = init;
-  </script>
+  <script src="main.js"></script>
 </body>
 </html>
