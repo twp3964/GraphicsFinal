@@ -2,39 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>CSCI-510: Final</title>
-  <!-- vertex Shader -->
-<script id="vertex-shader" type="x-shader/x-vertex">
-  attribute vec4 aVertexPosition;
-  attribute vec3 aVertexColor; // Adding color attribute
-
-  uniform mat4 uModelViewMatrix;
-  uniform mat4 uProjectionMatrix;
-
-  varying vec3 vColor; // Sending color to the fragment shader
-
-  void main() {
-    gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
-    vColor = aVertexColor; // Passing color to fragment shader
-  }
-</script>
-
-<!-- fragment Shader -->
-<script id="fragment-shader" type="x-shader/x-fragment">
-  precision mediump float;
-
-  varying vec3 vColor; // Receiving color from the vertex shader
-
-  void main(void) {
-    gl_FragColor = vec4(vColor, 1.0); // Using color received from vertex shader
-  }
-</script>
-
+  <title>Cubes</title>
   <style>
     body {
       margin: 0;
       overflow: hidden;
-      background-color: rgb(255, 255, 255); /* Set the background color to black */
     }
     canvas {
       display: block;
@@ -42,27 +14,7 @@
   </style>
 </head>
 <body>
-  <table>
-    <tr>
-      <td>
-        <canvas id="webgl-canvas" width="500" height="500">
-          Your browser does not support the HTML5 canvas element.
-        </canvas>
-      </td>
-      <td>
-        <h3>Controls</h3>
-        <table border="1">
-          <tbody>
-            <tr>
-              <td>W,A,S,D</td>
-              <td>Move the camera using WASD</td>
-            </tr>
-          </tbody>
-        </table>
-      </td>
-    </tr>
-  </table>
-
   <script src="main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
 </body>
 </html>
