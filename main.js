@@ -3,6 +3,7 @@ let camY = -60;
 let camZ = 300;
 let camLookX = 0;
 let camLookZ = 0;
+let zRoad = 500;
 
 
 function setup() {
@@ -12,7 +13,7 @@ function setup() {
         camLookX, 0, camLookZ, 0, 5, 0);
 
   for (let x = -200; x < 200; x += 20) {
-    for (let z = -500; z < 500; z += 20) {
+    for (let z = -zRoad; z < zRoad; z += 20) {
       push();
       translate(x, 0, z);
       box(20);
@@ -24,17 +25,19 @@ function setup() {
 window.addEventListener('keydown', gotKey, false);
 
 function gotKey(event) {
-  const step = 10; // Set the step value for movement
+  const step = 20; // Set the step value for movement
   const rotationAngle = 0.1; // Set the angle for rotation
 
   switch (event.key) {
     case 'w':
       camZ -= step;
       camLookZ -= step;
+      zRoad += step;
       break;
     case 's':
       camZ += step;
       camLookZ += step;
+      zRoad -= step;
       break;
     case 'a':
       camX = cos(-rotationAngle) * (camX - camLookX) - sin(-rotationAngle) * (camZ - camLookZ) + camLookX;
@@ -43,6 +46,13 @@ function gotKey(event) {
     case 'd':
       camX = cos(rotationAngle) * (camX - camLookX) - sin(rotationAngle) * (camZ - camLookZ) + camLookX;
       camZ = sin(rotationAngle) * (camX - camLookX) + cos(rotationAngle) * (camZ - camLookZ) + camLookZ;
+      break;
+    case 'r':
+      camX = 0;
+      camZ = 300;
+      camLookX = 0;
+      camLookZ = 0;
+      zRoad = 500;
       break;
   }
   // Redraw the scene after updating the camera position or rotation
