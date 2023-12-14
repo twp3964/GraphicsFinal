@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TESTING PAGE</title>
+    
+    <!-- vertex Shader -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TESTING PAGE</title>
+    
+    <!-- vertex Shader -->
+    <script id="vertex-shader" type="x-shader/x-vertex">
+      #version 300 es
+
+      in vec4 aVertexPosition;
+      in vec3 bary;
+      
+      uniform vec3 theta;     // Rotation angles
+      uniform vec4 translation;  // Translation values
+      
+      out vec3 vbc;
+      
+      void main() {
+          // Compute the sines and cosines of each rotation about each axis
+          vec3 angles = radians(theta);
+          vec3 c = cos(angles);
+          vec3 s = sin(angles);
+      
+          // Rotation matrices
+          mat4 rx = mat4(1.0, 0.0, 0.0, 0.0,
+                        0.0, c.x, s.x, 0.0,
+                        0.0, -s.x, c.x, 0.0,
+                        0.0, 0.0, 0.0, 1.0);
+      
+          mat4 ry = mat4(c.y, 0.0, -s.y, 0.0,
+                        0.0, 1.0, 0.0, 0.0,
+                        s.y, 0.0, c.y, 0.0,
+                        0.0, 0.0, 0.0, 1.0);
+      
+          mat4 rz = mat4(c.z, s.z, 0.0, 0.0,
+                        -s.z, c.z, 0.0, 0.0,
+                        0.0, 0.0, 1.0, 0.0,
+                        0.0, 0.0, 0.0, 1.0);
+      
+          // Combine rotation matrices
+          mat4 rotationMatrix = rz * ry * rx;
+      
+          // Apply rotation to the vertex position
+          vec4 rotatedVertex = rotationMatrix * aVertexPosition;
+      
+          // Apply translation to the rotated vertex position
+          vec4 finalPosition = rotatedVertex + translation;
+      
+          gl_Position = finalPosition;
+      
+          vbc = bary;
+      }
+      
+    </script>
+
+     <!-- fragment Shader -->
+     <script id="fragment-shader" type="x-shader/x-fragment">
+         #version 300 es
+         precision mediump float;
+         
+         in vec3 vbc;
+
+         // Color that is the result of this shader
+         out vec4 fragColor;
+
+         void main(void) {
+             
+             fragColor = vec4 (0.5, 0.5, 0.5, 1.0 );
+           // if on the edge, draw black, otherwise, draw grey
+           if (vbc.x < 0.01 || vbc.y < 0.01 || vbc.z < 0.01) {
+             fragColor = vec4 (1.0, 1.0, 1.0, 1.0);
+           }
+         }
+
+     </script>
+    <!-- include the main tesselation functions -->
+    <script type="text/javascript" src="./test.js"></script>
+    
+    <!-- keyboard functions -->
+    <!-- ... (other HTML code remains the same) -->
+
+<!-- keyboard functions -->
+<script type="text/javascript">
+
+  function gotKey(event) {
+      var key = event.key;
+      
+      // Incremental translation along Z-axis (forward and backward)
+    if (key == 'w'){
+      console.log("W");
+      Tz -= translateInc; // Move the camera up along the Y-axis
+    }
+    else if (key == 's'){
+      Tz += translateInc; // Move the camera down along the Y-axis
+    }
+    else if (key == 'a'){
+      console.log("A");
+        angles[1] -= angleInc;
+    }
+    else if (key == 'd'){
+        angles[1] += angleInc;
+    }
+      // Reset
+    else if (key == 'r' || key == 'R') {
+          camX = 0;
+          camY = -60;
+          camZ = 300;
+          camLookX = 0;
+          camLookZ = 0;
+      }
+      
+      //createCube(0, 0, 0);
+      draw();
+  }
+  </script>
+  
+  <!-- ... (rest of the HTML remains the same) -->
+  
+
+    
+    </script>
+
+  <script type="text/javascript">
+    // Call init once the webpage has loaded
+    window.onload = init;
+  </script>
+</head>
+
+<body>
+  <h1>CSCI-510: Tessellation</h1>
+  <table>
+      <tr>
+          <td><canvas id="webgl-canvas" width="800" height="600">
+            Your browser does not support the HTML5 canvas element.
+          </canvas></td>
+      </tr>
+  </table>
+  
