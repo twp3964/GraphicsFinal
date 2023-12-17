@@ -60,7 +60,7 @@ function setup() {
 
   let xoff = 0.0;
   let yoff = 0.0;
-  let scl_off = 0.2;
+  let scl_off = 0.25;
   for (let x = -300; x < 300; x += 20) {
     for (let z = -zRoad; z < zRoad; z += 20) {
       push();
@@ -69,14 +69,14 @@ function setup() {
       if (x < 60 && x > -60){
         box(20);
       }else{
-        box(20,map(perlin.get(xoff,yoff),0,1,0,100),20);
+        box(20,map(perlin.get(xoff,yoff),0,1,0,200),20);
 
         // box(20,random(30,60),20);
       }
       pop();
-      yoff += 0.01;
+      yoff += scl_off;
     }
-    xoff += 0.01;
+    xoff += scl_off;
   }
 }
 
