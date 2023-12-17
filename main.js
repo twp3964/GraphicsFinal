@@ -1,5 +1,5 @@
 let camX = 0;
-let camY = -200;
+let camY = -60;
 let camZ = 300;
 let camLookX = 0;
 let camLookZ = 0;
@@ -67,7 +67,13 @@ function setup() {
       translate(x, 0, z);
 
       if (x < 60 && x > -60){
-        box(20);
+        box(20,0,20);
+      }else if (x < 80 && x > -80){
+        box(20,map(perlin.get(xoff,yoff),0,1,0,20),20);
+      }else if (x < 100 && x > -100){
+        box(20,map(perlin.get(xoff,yoff),0,1,0,70),20);
+      }else if (x < 100 && x > -100){
+        box(20,map(perlin.get(xoff,yoff),0,1,0,100),20);
       }else{
         box(20,map(perlin.get(xoff,yoff),0,1,0,200),20);
 
