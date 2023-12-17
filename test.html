@@ -93,14 +93,14 @@
       
       // Incremental translation along Z-axis (forward and backward)
     if (key == 'w'){
-      console.log("W");
+      console.log(Tz);
       Tz -= translateInc; // Move the camera up along the Y-axis
     }
     else if (key == 's'){
       Tz += translateInc; // Move the camera down along the Y-axis
     }
     else if (key == 'a'){
-      console.log("A");
+      console.log(angles[1]);
         angles[1] -= angleInc;
     }
     else if (key == 'd'){
@@ -116,6 +116,7 @@
       }
       
       //createCube(0, 0, 0);
+      createRoad(1);
       draw();
   }
   </script>

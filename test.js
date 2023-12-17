@@ -15,8 +15,8 @@ var division1 = 3;
 var division2 = 1;
 var updateDisplay = true;
 var anglesReset = [0.0, 0.0, 0.0];
-var angles = [80.0, 0.0, 0.0];
-var Tx = -1.0, Ty = 0.0, Tz = -1.0;
+var angles = [30.0, 0.0, 0.0];
+var Tx = 0.0, Ty = -1.0, Tz = 0.0;
 var angleInc = 5.0;
 var translateInc = 0.1;
 
@@ -112,8 +112,29 @@ function addTriangle(x0, y0, z0, x1, y1, z1, x2, y2, z2) {
 }
 
 function createCube(x, y, z) {
-    addTriangle(x - 0.5, y - 0.5, z - 0.5, x + 0.5, y - 0.5, z - 0.5, x + 0.5, y + 0.5, z - 0.5); // Front face
-    addTriangle(x - 0.5, y - 0.5, z - 0.5, x + 0.5, y + 0.5, z - 0.5, x - 0.5, y + 0.5, z - 0.5); // Front face
+    // Front face
+    addTriangle(x - 0.5, y - 0.5, z - 0.5, x + 0.5, y - 0.5, z - 0.5, x + 0.5, y + 0.5, z - 0.5);
+    addTriangle(x - 0.5, y - 0.5, z - 0.5, x + 0.5, y + 0.5, z - 0.5, x - 0.5, y + 0.5, z - 0.5);
+
+    // Back face
+    addTriangle(x + 0.5, y - 0.5, z + 0.5, x - 0.5, y - 0.5, z + 0.5, x - 0.5, y + 0.5, z + 0.5);
+    addTriangle(x + 0.5, y - 0.5, z + 0.5, x - 0.5, y + 0.5, z + 0.5, x + 0.5, y + 0.5, z + 0.5);
+
+    // Left face
+    addTriangle(x - 0.5, y - 0.5, z + 0.5, x - 0.5, y - 0.5, z - 0.5, x - 0.5, y + 0.5, z - 0.5);
+    addTriangle(x - 0.5, y - 0.5, z + 0.5, x - 0.5, y + 0.5, z - 0.5, x - 0.5, y + 0.5, z + 0.5);
+
+    // Right face
+    addTriangle(x + 0.5, y - 0.5, z - 0.5, x + 0.5, y - 0.5, z + 0.5, x + 0.5, y + 0.5, z + 0.5);
+    addTriangle(x + 0.5, y - 0.5, z - 0.5, x + 0.5, y + 0.5, z + 0.5, x + 0.5, y + 0.5, z - 0.5);
+
+    // Top face
+    addTriangle(x - 0.5, y + 0.5, z + 0.5, x + 0.5, y + 0.5, z + 0.5, x + 0.5, y + 0.5, z - 0.5);
+    addTriangle(x - 0.5, y + 0.5, z + 0.5, x + 0.5, y + 0.5, z - 0.5, x - 0.5, y + 0.5, z - 0.5);
+
+    // Bottom face
+    addTriangle(x - 0.5, y - 0.5, z - 0.5, x + 0.5, y - 0.5, z - 0.5, x + 0.5, y - 0.5, z + 0.5);
+    addTriangle(x - 0.5, y - 0.5, z - 0.5, x + 0.5, y - 0.5, z + 0.5, x - 0.5, y - 0.5, z + 0.5);
     
     if (myVAO == null) myVAO = gl.createVertexArray();
       gl.bindVertexArray(myVAO);
@@ -341,7 +362,7 @@ function init() {
   // create and bind your current object
   //createRoad(20)
 
-  createMountain(100,100,10);
+  //createMountain(100,100,10);
   
   // do a draw
   draw();
