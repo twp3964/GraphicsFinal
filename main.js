@@ -1,9 +1,55 @@
 let camX = 0;
-let camY = -60;
+let camY = -200;
 let camZ = 300;
 let camLookX = 0;
 let camLookZ = 0;
-let zRoad = 500;
+let zRoad = 600;
+
+'use strict';
+let perlin = {
+    rand_vect: function(){
+        let theta = Math.random() * 2 * Math.PI;
+        return {x: Math.cos(theta), y: Math.sin(theta)};
+    },
+    dot_prod_grid: function(x, y, vx, vy){
+        let g_vect;
+        let d_vect = {x: x - vx, y: y - vy};
+        if (this.gradients[[vx,vy]]){
+            g_vect = this.gradients[[vx,vy]];
+        } else {
+            g_vect = this.rand_vect();
+            this.gradients[[vx, vy]] = g_vect;
+        }
+        return d_vect.x * g_vect.x + d_vect.y * g_vect.y;
+    },
+    smootherstep: function(x){
+        return 6*x**5 - 15*x**4 + 10*x**3;
+    },
+    interp: function(x, a, b){
+        return a + this.smootherstep(x) * (b-a);
+    },
+    seed: function(){
+        this.gradients = {};
+        this.memory = {};
+    },
+    get: function(x, y) {
+        if (this.memory.hasOwnProperty([x,y]))
+            return this.memory[[x,y]];
+        let xf = Math.floor(x);
+        let yf = Math.floor(y);
+        //interpolate
+        let tl = this.dot_prod_grid(x, y, xf,   yf);
+        let tr = this.dot_prod_grid(x, y, xf+1, yf);
+        let bl = this.dot_prod_grid(x, y, xf,   yf+1);
+        let br = this.dot_prod_grid(x, y, xf+1, yf+1);
+        let xt = this.interp(x-xf, tl, tr);
+        let xb = this.interp(x-xf, bl, br);
+        let v = this.interp(y-yf, xt, xb);
+        this.memory[[x,y]] = v;
+        return v;
+    }
+}
+perlin.seed();
 
 
 function setup() {
@@ -12,13 +58,25 @@ function setup() {
   camera(camX, camY, camZ, 
         camLookX, 0, camLookZ, 0, 5, 0);
 
-  for (let x = -200; x < 200; x += 20) {
+  let xoff = 0.0;
+  let yoff = 0.0;
+  let scl_off = 0.2;
+  for (let x = -300; x < 300; x += 20) {
     for (let z = -zRoad; z < zRoad; z += 20) {
       push();
       translate(x, 0, z);
-      box(20);
+
+      if (x < 60 && x > -60){
+        box(20);
+      }else{
+        box(20,map(perlin.get(xoff,yoff),0,1,0,100),20);
+
+        // box(20,random(30,60),20);
+      }
       pop();
+      yoff += 0.01;
     }
+    xoff += 0.01;
   }
 }
 
