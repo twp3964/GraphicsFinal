@@ -327,6 +327,22 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    function drawTree(instructions) {
+        for (const instruction of instructions) {
+            const from = instruction.from;
+            const to = instruction.to;
+    
+            // Create vertices for a line segment between 'from' and 'to'
+            const treeVertices = [
+                from.x, from.y, from.z,
+                to.x, to.y, to.z,
+            ];
+    
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(treeVertices), gl.STATIC_DRAW);
+    
+            gl.drawArrays(gl.LINES, 0, 2); // Draw the line segment
+        }
+    }
     
     function render() {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
