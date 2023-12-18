@@ -109,7 +109,7 @@ function setup() {
 
   let xoff = 0.0;
   let yoff = 0.0;
-  let scl_off = 0.25;
+  let scl_off = 0.1; // Adjust the scale offset for smoother changes
   let counter = 0;
 
   for (let x = -300; x < 300; x += 20) {
@@ -123,14 +123,10 @@ function setup() {
           drawTree(x, 10, z);
           counter = 0;
         }
-      } else if (x < 80 && x > -80) {
-        box(20, map(perlin.get(xoff, yoff), 0, 1, 0, 20), 20);
-      } else if (x < 100 && x > -100) {
-        box(20, map(perlin.get(xoff, yoff), 0, 1, 0, 70), 20);
-      } else if (x < 120 && x > -120) {
-        box(20, map(perlin.get(xoff, yoff), 0, 1, 0, 100), 20);
-      } else {
-        box(20, map(perlin.get(xoff, yoff), 0, 1, 0, 200), 20);
+      } 
+      else {
+        let boxHeight = map(perlin.get(xoff, yoff), 0, 1, 0, 200); // Adjust mapping range for varied heights
+        box(20, boxHeight, 20);
       }
       pop();
       counter += 1;
