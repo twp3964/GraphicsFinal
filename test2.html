@@ -75,25 +75,57 @@
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
 
-        const positions = [
-            // First square
-            -2.0, 0.0, -1.0,
-            2.0, 0.0, -1.0,
-            -2.0, 0.0, -100.0,
-            2.0, 0.0, -100.0
+        // const positions = [
+        //     // First square
+        //     -2.0, 0.0, -1.0,
+        //     2.0, 0.0, -1.0,
+        //     -2.0, 0.0, -100.0,
+        //     2.0, 0.0, -100.0
 
-            // // Second square
-            // -3.0, 0.0, -3.0,
-            // -1.0, 0.0, -3.0,
-            // -3.0, 0.0, -1.0,
-            // -1.0, 0.0, -1.0,
+        //     // // Second square
+        //     // -3.0, 0.0, -3.0,
+        //     // -1.0, 0.0, -3.0,
+        //     // -3.0, 0.0, -1.0,
+        //     // -1.0, 0.0, -1.0,
 
-            // // Third square
-            // 1.0, 0.0, -3.0,
-            // 3.0, 0.0, -3.0,
-            // 1.0, 0.0, -1.0,
-            // 3.0, 0.0, -1.0,
-        ];
+        //     // // Third square
+        //     // 1.0, 0.0, -3.0,
+        //     // 3.0, 0.0, -3.0,
+        //     // 1.0, 0.0, -1.0,
+        //     // 3.0, 0.0, -1.0,
+        // ];
+
+        // POSITION GENERATOR
+
+        //left to right and then right to left
+        const gridSize = 100; // Adjust the size of the grid as needed
+        const tileSize = 1; // Size of each tile
+
+        const positions = [];
+
+        let verticies = 0
+
+        for (let x = -gridSize / 2; x <= gridSize / 2; x++) {
+            for (let z = -gridSize / 2; z <= gridSize / 2; z++) {
+                // Define the four corners of each tile
+                const x0 = x * tileSize;
+                const z0 = z * tileSize;
+                const x1 = (x + 1) * tileSize;
+                const z1 = (z + 1) * tileSize;
+
+                // Add the vertices for the tile (two triangles forming a square)
+                positions.push(x0, 0, z0);
+                positions.push(x1, 0, z0);
+                positions.push(x0, 0, z1);
+
+                positions.push(x0, 0, z1);
+                positions.push(x1, 0, z0);
+                positions.push(x1, 0, z1);
+
+                verticies+=6;
+            }
+        }
+
 
 
 
@@ -129,7 +161,7 @@
             gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrix, false, modelViewMatrix);
             gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
 
-            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);;
+            gl.drawArrays(gl.LINES, 0, verticies);;
 
 
             requestAnimationFrame(render);
