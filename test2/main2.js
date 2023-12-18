@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const positions = [];
 
-    let verticies = 0
+    let verticies = 0;
 
     for (let x = -gridSize / 2; x <= gridSize / 2; x++) {
         for (let z = -gridSize / 2; z <= gridSize / 2; z++) {
@@ -169,6 +169,44 @@ document.addEventListener("DOMContentLoaded", function () {
             verticies+=6;
         }
     }
+
+    let triangleVerticiesStart = verticies;
+    let triangleVerticiesEnd = verticies;
+
+    const grassHeight = 0.3; // Adjust the height of the grass as needed
+
+    for (let x = -gridSize / 2; x <= gridSize / 2; x++) {
+        for (let z = -gridSize / 2; z <= gridSize / 2; z++) {
+            if (x >= -2 && x <= 2 && z >= -100 && z <= 100 && x % 1 === 0) {
+                // Logic for creating grass triangles at specific intervals within the road area
+                const lineHeight = 0.5; // Set the height of the ground
+                const bladeCount = 5; // Number of grass blades at each point
+
+                for (let i = 0; i < bladeCount; i++) {
+                    const xOffset = (Math.random() - 0.5) * 0.5; // Randomize X position
+                    const zOffset = (Math.random() - 0.5) * 0.5; // Randomize Z position
+
+                    // Define the base position for each blade of grass
+                    const x0 = (x + xOffset) * tileSize;
+                    const z0 = (z + zOffset) * tileSize;
+                    const x1 = x0 - 0.05; // Define the width of the grass blade
+                    const z1 = z0 + 0.1;  // Set the length of the grass blade
+                    
+                    // Set the Y-values for the grass blade
+                    const y00 = lineHeight;
+                    const y01 = lineHeight + grassHeight;
+
+                    // Add vertices for the grass blade triangles
+                    positions.push(x0, y00, z0);
+                    positions.push(x1, y01, z1);
+                    positions.push(x0 + 0.05, y00, z0); // Define the other edge of the triangle
+
+                    triangleVerticiesEnd += 3; // Update the number of vertices added for each triangle
+                }
+            }
+        }
+    }
+
 
 
     function normalize(vec) {
@@ -327,22 +365,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    function drawTree(instructions) {
-        for (const instruction of instructions) {
-            const from = instruction.from;
-            const to = instruction.to;
     
-            // Create vertices for a line segment between 'from' and 'to'
-            const treeVertices = [
-                from.x, from.y, from.z,
-                to.x, to.y, to.z,
-            ];
-    
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(treeVertices), gl.STATIC_DRAW);
-    
-            gl.drawArrays(gl.LINES, 0, 2); // Draw the line segment
-        }
-    }
     
     function render() {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -381,19 +404,20 @@ document.addEventListener("DOMContentLoaded", function () {
         gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
 
 
-        const texture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, texture);
+        // const texture = gl.createTexture();
+        // gl.bindTexture(gl.TEXTURE_2D, texture);
         
-        // Upload image data to the texture
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-        gl.generateMipmap(gl.TEXTURE_2D);
+        // // Upload image data to the texture
+        // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+        // gl.generateMipmap(gl.TEXTURE_2D);
         
-        // Set texture parameters
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        // // Set texture parameters
+        // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         
 
         gl.drawArrays(gl.LINES, 0, verticies);
+        gl.drawArrays(gl.TRIANGLES, triangleVerticiesStart, triangleVerticiesEnd);
     
         requestAnimationFrame(render);
     }
