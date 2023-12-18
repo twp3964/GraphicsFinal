@@ -1,6 +1,6 @@
 window.onload = function () {
     // Get the WebGL context
-    var canvas = document.getElementById("webgl-canvas");
+    var canvas = document.getElementById("webgl-canvas1");
     var gl = canvas.getContext("webgl");
 
     if (!gl) {
