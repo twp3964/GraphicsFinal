@@ -5,6 +5,10 @@ let camLookX = 0;
 let camLookZ = 0;
 let zRoad = 600;
 
+let cubeTexture;
+let treeTexture;
+let leafTexture;
+
 'use strict';
 let perlin = {
     rand_vect: function(){
@@ -95,15 +99,23 @@ function drawTree(x, y, z) {
     rotateZ(angleZ); // Apply the random rotation around z-axis
 
     // Draw ellipsoid leaves
+    texture(leafTexture);
     ellipsoid(leafWidth, leafWidth * 0.5, leafHeight);
     pop();
   }
   pop();
 }
 
+function preload() {
+  // Load textures for cubes and trees
+  cubeTexture = loadImage('textures/neonTexture.jpg');
+  treeTexture = loadImage('textures/woodTexture.jpg');
+  leafTexture = loadImage('textures/leafTexture.jpeg');
+}
+
 
 function setup() {
-  createCanvas(400, 400, WEBGL);
+  createCanvas(800, 800, WEBGL);
   background(220);
   camera(camX, camY, camZ, camLookX, 0, camLookZ, 0, 5, 0);
 
@@ -118,14 +130,17 @@ function setup() {
       translate(x, 0, z);
 
       if (x < 60 && x > -60) {
+        //texture(cubeTexture);
         box(20, 20, 20);
         if ((x == 20 || x == -20) && counter > 2){
+          texture(treeTexture);
           drawTree(x, 10, z);
           counter = 0;
         }
       } 
       else {
         let boxHeight = map(perlin.get(xoff, yoff), 0, 1, 0, 200); // Adjust mapping range for varied heights
+        texture(cubeTexture);
         box(20, boxHeight, 20);
       }
       pop();
