@@ -10,7 +10,7 @@
     </style>
 </head>
 <body>
-    <canvas id="webgl-canvas"></canvas>
+    <canvas id="webgl-canvas" width ="500" height="500"></canvas>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -23,8 +23,12 @@
             }
 
             // Load texture image
-            const textureImage = new Image();
+            const textureImage = new Image(100,100);
             textureImage.src = 'texture-floor.jpg'; // Update with the path to your texture image
+
+            textureImage.onload = function () {
+                initializeWebGL(gl, textureImage, gridSize, tileSize);
+            };
 
             // Vertex and fragment shader source code
             const vsSource = `
@@ -170,6 +174,9 @@
                 }
             }
 
+            function initializeWebGL(gl, textureImage, gridSize, tileSize) {
+
+
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates), gl.STATIC_DRAW);
 
             // Set up the attribute pointers for position and texture coordinates
@@ -181,22 +188,27 @@
             gl.vertexAttribPointer(textureCoordAttributeLocation, 2, gl.FLOAT, false, 0, 0);
             gl.enableVertexAttribArray(textureCoordAttributeLocation);
 
-            // Set up the texture
-            const texture = gl.createTexture();
-            gl.bindTexture(gl.TEXTURE_2D, texture);
+
 
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureImage);
 
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 
-            // Set up the model-view and projection matrices
-            const modelViewMatrix = mat4.create();
-            const projectionMatrix = mat4.create();
+
+
+            }
 
             // Set up the main render loop
             function render() {
                 gl.clearColor(112.0/256,128.0/256,144.0/256,1.0)
+
+            // Set up the model-view and projection matrices
+            const modelViewMatrix = mat4.create();
+            const projectionMatrix = mat4.create();
+
+            const texture = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, texture);
 
                 // Update and render the grid with texture
                 gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);

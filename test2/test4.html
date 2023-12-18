@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Textured Grid</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <canvas id="webgl-canvas" width="500" height="500"></canvas>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const canvas = document.getElementById("webgl-canvas");
+            const gl = canvas.getContext("webgl");
+
+            if (!gl) {
+                console.error("Unable to initialize WebGL. Your browser may not support it.");
+                return;
+            }
+
+            const gridSize = 100; // Adjust the size of the grid as needed
+            const tileSize = 1; // Size of each tile
+
+            // Load texture image
+            const textureImage = new Image();
+            textureImage.src = 'texture-floor.jpg'; // Update with the path to your texture image
+
+            textureImage.onload = function () {
+                initializeWebGL(gl, textureImage, gridSize, tileSize);
+            };
+
+            function initializeWebGL(gl, textureImage, gridSize, tileSize) {
+                // Vertex and fragment shader source code
+                const vsSource = `
+                    attribute vec4 aVertexPosition;
+                    attribute vec2 aTextureCoord;
+                    varying highp vec2 vTextureCoord;
+                    uniform mat4 uModelViewMatrix;
+                    uniform mat4 uProjectionMatrix;
+                    void main(void) {
+                        gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+                        vTextureCoord = aTextureCoord;
+                    }
+                `;
+
+                const fsSource = `
+                    varying highp vec2 vTextureCoord;
+                    uniform sampler2D uSampler;
+                    void main(void) {
+                        gl_FragColor = texture2D(uSampler, vTextureCoord);
+                    }
+                `;
+
+                const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
+
+
+                // Create position buffer
+                const positionBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+
+                const positions = [];
+
+                let verticies = 0
+
+                for (let x = -gridSize / 2; x <= gridSize / 2; x++) {
+                    for (let z = -gridSize / 2; z <= gridSize / 2; z++) {
+                        const x0 = x * tileSize;
+                        const z0 = z * tileSize;
+                        const x1 = (x + 1) * tileSize;
+                        const z1 = (z + 1) * tileSize;
+                        const divFactor = 10;
+                
+                        // Add the vertices for the tile with the Perlin noise applied to Y values
+                        positions.push(x0, 0, z0);
+                        positions.push(x1, 0, z0);
+                        positions.push(x0, 0, z1);
+                
+                        positions.push(x0, 0, z1);
+                        positions.push(x1, 0, z0);
+                        positions.push(x1, 0, z1);
+
+                        verticies+=6;
+                    }
+                }
+
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+
+                // Create texture coordinate buffer
+                const textureCoordBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
+
+                const textureCoordinates = [];
+                for (let i = 0; i < gridSize; i++) {
+                    for (let j = 0; j < gridSize; j++) {
+                        const s = i / (gridSize - 1);
+                        const t = j / (gridSize - 1);
+                        textureCoordinates.push(s, t);
+                    }
+                }
+
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates), gl.STATIC_DRAW);
+
+                // Set up the attribute pointers for position and texture coordinates
+                const positionAttributeLocation = gl.getAttribLocation(shaderProgram, "aVertexPosition");
+                gl.vertexAttribPointer(positionAttributeLocation, 3, gl.FLOAT, false, 0, 0);
+                gl.enableVertexAttribArray(positionAttributeLocation);
+
+                const textureCoordAttributeLocation = gl.getAttribLocation(shaderProgram, "aTextureCoord");
+                gl.vertexAttribPointer(textureCoordAttributeLocation, 2, gl.FLOAT, false, 0, 0);
+                gl.enableVertexAttribArray(textureCoordAttributeLocation);
+
+                // Set up the texture
+                const texture = gl.createTexture();
+                gl.bindTexture(gl.TEXTURE_2D, texture);
+
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureImage);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+                // Set up the model-view and projection matrices
+                const modelViewMatrix = mat4.create();
+                const projectionMatrix = mat4.create();
+
+                // Set up the main render loop
+                function render() {
+                    gl.clearColor(112.0/256, 128.0/256, 144.0/256, 1.0);
+
+                    // Update and render the grid with texture
+                    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+                    mat4.lookAt(modelViewMatrix, [0, 5, 5], [0, 0, 0], [0, 1, 0]);
+                    mat4.perspective(projectionMatrix, Math.PI / 4, canvas.width / canvas.height, 0.1, 100.0);
+
+                    gl.useProgram(shaderProgram);
+
+                    const uModelViewMatrix = gl.getUniformLocation(shaderProgram, "uModelViewMatrix");
+                    gl.uniformMatrix4fv(uModelViewMatrix, false, modelViewMatrix);
+
+                    const uProjectionMatrix = gl.getUniformLocation(shaderProgram, "uProjectionMatrix");
+                    gl.uniformMatrix4fv(uProjectionMatrix, false, projectionMatrix);
+
+                    gl.activeTexture(gl.TEXTURE0);
+                    gl.bindTexture(gl.TEXTURE_2D, texture);
+                    gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler"), 0);
+
+                    gl.drawArrays(gl.TRIANGLES, 0, positions.length / 3);
+
+                    requestAnimationFrame(render);
+                }
+
+                render(); // Start the render loop
+            }
+
+            // Compile shaders, link program, use program
+            function initShaderProgram(gl, vsSource, fsSource) {
+                const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
+                const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
+
+                const shaderProgram = gl.createProgram();
+                gl.attachShader(shaderProgram, vertexShader);
+                gl.attachShader(shaderProgram, fragmentShader);
+                gl.linkProgram(shaderProgram);
+
+                if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+                    console.error("Unable to initialize the shader program: " + gl.getProgramInfoLog(shaderProgram));
+                    return null;
+                }
+
+                return shaderProgram;
+            }
+
+            // Load shader
+            function loadShader(gl, type, source) {
+                const shader = gl.createShader(type);
+                gl.shaderSource(shader, source);
+                gl.compileShader(shader);
+
+                if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                    console.error("An error occurred compiling the shaders: " + gl.getShaderInfoLog(shader));
+                    gl.deleteShader(shader);
+                    return null;
+                }
+
+                return shader;
+            }
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.4.0/gl-matrix.js"></script>
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple WebGL</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <canvas id="webgl-canvas" width="500" height="500"></canvas>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const canvas = document.getElementById("webgl-canvas");
+            const gl = canvas.getContext("webgl");
+    
+            if (!gl) {
+                console.error("Unable to initialize WebGL. Your browser may not support it.");
+                return;
+            }
+
+            // Load texture image
+            const textureImage = new Image();
+            textureImage.src = 'texture-floor.jpg'; // Update with the path to your texture image
+
+            textureImage.onload = function () {
+                initializeWebGL(gl, textureImage);
+            };
+    
+            const vsSource = `
+                attribute vec4 aVertexPosition;
+                attribute vec2 aTextureCoord;
+                varying highp vec2 vTextureCoord;
+                uniform mat4 uModelViewMatrix;
+                uniform mat4 uProjectionMatrix;
+                void main(void) {
+                    gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+                    vTextureCoord = aTextureCoord;
+                }
+            `;
+    
+            const fsSource = `
+                varying highp vec2 vTextureCoord;
+                uniform sampler2D uSampler;
+                void main(void) {
+                    gl_FragColor = texture2D(uSampler, vTextureCoord);
+                }
+            `;
+    
+            const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
+            const positionBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+
+            const gridSize = 100; // Adjust the size of the grid as needed
+            const tileSize = 1; // Size of each tile
+    
+            const positions = [];
+            const textureCoordinates = [];
+    
+            for (let x = -gridSize / 2; x <= gridSize / 2; x++) {
+                for (let z = -gridSize / 2; z <= gridSize / 2; z++) {
+                    const x0 = x * tileSize;
+                    const z0 = z * tileSize;
+                    const x1 = (x + 1) * tileSize;
+                    const z1 = (z + 1) * tileSize;
+    
+                    positions.push(x0, 0.0, z0);
+                    positions.push(x1, 0.0, z0);
+                    positions.push(x0, 0.0, z1);
+    
+                    positions.push(x0, 0.0, z1);
+                    positions.push(x1, 0.0, z0);
+                    positions.push(x1, 0.0, z1);
+    
+                    const s0 = (x + gridSize / 2) / gridSize;
+                    const s1 = (x + gridSize / 2 + 1) / gridSize;
+                    const t0 = (z + gridSize / 2) / gridSize;
+                    const t1 = (z + gridSize / 2 + 1) / gridSize;
+    
+                    textureCoordinates.push(s0, t0);
+                    textureCoordinates.push(s1, t0);
+                    textureCoordinates.push(s0, t1);
+    
+                    textureCoordinates.push(s0, t1);
+                    textureCoordinates.push(s1, t0);
+                    textureCoordinates.push(s1, t1);
+                }
+            }
+    
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+    
+            const positionAttributeLocation = gl.getAttribLocation(shaderProgram, "aVertexPosition");
+            gl.vertexAttribPointer(positionAttributeLocation, 3, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(positionAttributeLocation);
+    
+            const textureCoordBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates), gl.STATIC_DRAW);
+    
+            const textureCoordAttributeLocation = gl.getAttribLocation(shaderProgram, "aTextureCoord");
+            gl.vertexAttribPointer(textureCoordAttributeLocation, 2, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(textureCoordAttributeLocation);
+    
+            const modelViewMatrix = mat4.create();
+            const projectionMatrix = mat4.create();
+    
+            mat4.lookAt(modelViewMatrix, [0, 5, 5], [0, 0, 0], [0, 1, 0]);
+            mat4.perspective(projectionMatrix, Math.PI / 4, canvas.width / canvas.height, 0.1, 100.0);
+    
+            const uModelViewMatrix = gl.getUniformLocation(shaderProgram, "uModelViewMatrix");
+            gl.uniformMatrix4fv(uModelViewMatrix, false, modelViewMatrix);
+    
+            const uProjectionMatrix = gl.getUniformLocation(shaderProgram, "uProjectionMatrix");
+            gl.uniformMatrix4fv(uProjectionMatrix, false, projectionMatrix);
+    
+            const texture = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+    
+            const dummyTexture = new Uint8Array([255, 255, 255, 255]);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, dummyTexture);
+    
+
+            textureImage.onerror = function (e) {
+                console.error("Error loading texture:", e);
+            };
+
+    
+            function render() {
+                gl.clearColor(112.0 / 256, 128.0 / 256, 144.0 / 256, 1.0)
+                gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+                mat4.lookAt(modelViewMatrix, [0, 5, 5], [0, 0, 0], [0, 1, 0]);
+                mat4.perspective(projectionMatrix, Math.PI / 4, canvas.width / canvas.height, 0.1, 100.0);
+
+                gl.useProgram(shaderProgram);
+
+                const uModelViewMatrix = gl.getUniformLocation(shaderProgram, "uModelViewMatrix");
+                gl.uniformMatrix4fv(uModelViewMatrix, false, modelViewMatrix);
+
+                const uProjectionMatrix = gl.getUniformLocation(shaderProgram, "uProjectionMatrix");
+                gl.uniformMatrix4fv(uProjectionMatrix, false, projectionMatrix);
+
+                const uSamplerLocation = gl.getUniformLocation(shaderProgram, "uSampler");
+                gl.uniform1i(uSamplerLocation, 0);
+
+                gl.activeTexture(gl.TEXTURE0);
+                gl.bindTexture(gl.TEXTURE_2D, texture);
+                gl.drawArrays(gl.TRIANGLES, 0, verticies);
+
+                requestAnimationFrame(render);
+            }
+
+            render(); // Start the render loop
+        });
+    
+        function initShaderProgram(gl, vsSource, fsSource) {
+            const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
+            const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
+    
+            const shaderProgram = gl.createProgram();
+            gl.attachShader(shaderProgram, vertexShader);
+            gl.attachShader(shaderProgram, fragmentShader);
+            gl.linkProgram(shaderProgram);
+    
+            if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+                console.error("Unable to initialize the shader program: " + gl.getProgramInfoLog(shaderProgram));
+                return null;
+            }
+    
+            return shaderProgram;
+        }
+    
+        function loadShader(gl, type, source) {
+            const shader = gl.createShader(type);
+            gl.shaderSource(shader, source);
+            gl.compileShader(shader);
+    
+            if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                console.error("An error occurred compiling the shaders: " + gl.getShaderInfoLog(shader));
+                gl.deleteShader(shader);
+                return null;
+            }
+    
+            return shader;
+        }
+
+
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.4.0/gl-matrix.js"></script>
+
+    
+</body>
+</html>
