@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Textured Grid</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <canvas id="webgl-canvas"></canvas>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const canvas = document.getElementById("webgl-canvas");
+            const gl = canvas.getContext("webgl");
+
+            if (!gl) {
+                console.error("Unable to initialize WebGL. Your browser may not support it.");
+                return;
+            }
+
+            // Load texture image
+            const textureImage = new Image();
+            textureImage.src = 'texture-floor.jpg'; // Update with the path to your texture image
+
+            // Vertex and fragment shader source code
+            const vsSource = `
+                attribute vec4 aVertexPosition;
+                attribute vec2 aTextureCoord;
+                varying highp vec2 vTextureCoord;
+                uniform mat4 uModelViewMatrix;
+                uniform mat4 uProjectionMatrix;
+                void main(void) {
+                    gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+                    vTextureCoord = aTextureCoord;
+                }
+            `;
+
+            const fsSource = `
+                varying highp vec2 vTextureCoord;
+                uniform sampler2D uSampler;
+                void main(void) {
+                    gl_FragColor = texture2D(uSampler, vTextureCoord);
+                }
+            `;
+
+            // Compile shaders, link program, use program
+            function initShaderProgram(gl, vsSource, fsSource) {
+                const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
+                const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
+
+                const shaderProgram = gl.createProgram();
+                gl.attachShader(shaderProgram, vertexShader);
+                gl.attachShader(shaderProgram, fragmentShader);
+                gl.linkProgram(shaderProgram);
+
+                if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+                    console.error("Unable to initialize the shader program: " + gl.getProgramInfoLog(shaderProgram));
+                    return null;
+                }
+
+                return shaderProgram;
+            }
+
+
+            function loadShader(gl, type, source) {
+                const shader = gl.createShader(type);
+                gl.shaderSource(shader, source);
+                gl.compileShader(shader);
+
+                if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                    console.error("An error occurred compiling the shaders: " + gl.getShaderInfoLog(shader));
+                    gl.deleteShader(shader);
+                    return null;
+                }
+
+                return shader;
+            }
+
+            const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
+            const positionBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+
+            // POSITION GENERATOR
+            //left to right and then right to left
+            const gridSize = 100; // Adjust the size of the grid as needed
+            const tileSize = 1; // Size of each tile
+
+            const positions = [];
+
+            let verticies = 0
+
+            for (let x = -gridSize / 2; x <= gridSize / 2; x++) {
+                for (let z = -gridSize / 2; z <= gridSize / 2; z++) {
+                    const x0 = x * tileSize;
+                    const z0 = z * tileSize;
+                    const x1 = (x + 1) * tileSize;
+                    const z1 = (z + 1) * tileSize;
+
+                    const divFactor = 10;
+            
+                    // Add Perlin noise to the Y values to create a mountainous appearance
+                    let y00 = perlinNoise(x0 / divFactor, z0 / divFactor);
+                    let y01 = perlinNoise(x0 / divFactor, z1 / divFactor);
+                    let y10 = perlinNoise(x1 / divFactor, z0 / divFactor);
+                    let y11 = perlinNoise(x1 / divFactor, z1 / divFactor);
+                    
+                    if (y00 < 0){
+                        y00 = 0;
+                    }
+
+                    if (y01 < 0){
+                        y01 = 0;
+                    }
+
+                    if (y10 < 0){
+                        y10 = 0;
+                    }
+
+                    if (y11 < 0){
+                        y11 = 0;
+                    }
+
+                    const scl1 = 0.0;
+                    const scl2 = 0.1;
+                    const scl3 = 0.25;
+                    const scl4 = 0.75;
+                    const scl5 = 1.25;
+
+                    if (x < 2 && x > -2){
+                        y00 = y00 * scl1;
+                        y01 = y01 * scl1;
+                        y10 = y10 * scl1;
+                        y11 = y11 * scl1;
+                    }else{
+                        y00 = y00 * scl5;
+                        y01 = y01 * scl5;
+                        y10 = y10 * scl5;
+                        y11 = y11 * scl5;
+                    }
+            
+                    // Add the vertices for the tile with the Perlin noise applied to Y values
+                    positions.push(x0, y00, z0);
+                    positions.push(x1, y10, z0);
+                    positions.push(x0, y01, z1);
+            
+                    positions.push(x0, y01, z1);
+                    positions.push(x1, y10, z0);
+                    positions.push(x1, y11, z1);
+
+                    verticies+=6;
+                }
+            }
+
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+
+            // Set up the texture coordinates
+            const textureCoordBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
+
+            const textureCoordinates = [];
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    const s = i / (gridSize - 1);
+                    const t = j / (gridSize - 1);
+                    textureCoordinates.push(s, t);
+                }
+            }
+
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates), gl.STATIC_DRAW);
+
+            // Set up the attribute pointers for position and texture coordinates
+            const positionAttributeLocation = gl.getAttribLocation(shaderProgram, "aVertexPosition");
+            gl.vertexAttribPointer(positionAttributeLocation, 3, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(positionAttributeLocation);
+
+            const textureCoordAttributeLocation = gl.getAttribLocation(shaderProgram, "aTextureCoord");
+            gl.vertexAttribPointer(textureCoordAttributeLocation, 2, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(textureCoordAttributeLocation);
+
+            // Set up the texture
+            const texture = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureImage);
+
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+            // Set up the model-view and projection matrices
+            const modelViewMatrix = mat4.create();
+            const projectionMatrix = mat4.create();
+
+            // Set up the main render loop
+            function render() {
+                gl.clearColor(112.0/256,128.0/256,144.0/256,1.0)
+
+                // Update and render the grid with texture
+                gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+                mat4.lookAt(modelViewMatrix, [0, 5, 5], [0, 0, 0], [0, 1, 0]);
+                mat4.perspective(projectionMatrix, Math.PI / 4, canvas.width / canvas.height, 0.1, 100.0);
+
+                gl.useProgram(shaderProgram);
+
+                const uModelViewMatrix = gl.getUniformLocation(shaderProgram, "uModelViewMatrix");
+                gl.uniformMatrix4fv(uModelViewMatrix, false, modelViewMatrix);
+
+                const uProjectionMatrix = gl.getUniformLocation(shaderProgram, "uProjectionMatrix");
+                gl.uniformMatrix4fv(uProjectionMatrix, false, projectionMatrix);
+
+                gl.activeTexture(gl.TEXTURE0);
+                gl.bindTexture(gl.TEXTURE_2D, texture);
+                gl.uniform1i(gl.getUniformLocation(shaderProgram, "uSampler"), 0);
+
+                gl.drawArrays(gl.TRIANGLES, 0, positions.length / 3);
+
+                requestAnimationFrame(render);
+            }
+
+            render(); // Start the render loop
+        });
+
+                // Perlin noise functions
+        function fade(t) {
+            return t * t * t * (t * (t * 6 - 15) + 10);
+        }
+
+        function lerp(t, a, b) {
+            return a + t * (b - a);
+        }
+
+        function grad(hash, x, y) {
+            const h = hash & 15;
+            const grad = 1 + (h & 7); // Gradient value 1-8
+            const hGrad = h & 7; // Gradient index 0-7
+            const u = hGrad < 4 ? x : y; // Alternate the gradient directions
+            return (h & 8 ? -grad : grad) * u; // Randomly invert half of the gradients
+        }
+
+        function perlinNoise(x, y) {
+            // Determine grid cell coordinates
+            const X = Math.floor(x) & 255;
+            const Y = Math.floor(y) & 255;
+
+            // Relative x, y coordinates within the cell
+            x -= Math.floor(x);
+            y -= Math.floor(y);
+
+            // Compute fade curves for x and y
+            const u = fade(x);
+            const v = fade(y);
+
+            // Hash coordinates of the 4 cube corners
+            const a = (perlinPerm[X] + Y) & 255;
+            const b = (perlinPerm[X + 1] + Y) & 255;
+            const c = (perlinPerm[X] + Y + 1) & 255;
+            const d = (perlinPerm[X + 1] + Y + 1) & 255;
+
+            // And add blended results from 4 corners of the cube
+            return lerp(v, lerp(u, grad(perlinPerm[a], x, y), grad(perlinPerm[b], x - 1, y)),
+                            lerp(u, grad(perlinPerm[c], x, y - 1), grad(perlinPerm[d], x - 1, y - 1)));
+        }
+
+        // Permutation table
+        const perlinPerm = [...Array(512)].map((_, i) => i);
+        for (let i = perlinPerm.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [perlinPerm[i], perlinPerm[j]] = [perlinPerm[j], perlinPerm[i]];
+        }
+        perlinPerm.push(...perlinPerm);
+
+        // Example usage
+        const noiseValue = perlinNoise(0.5, 0.5);
+        console.log(noiseValue);
+
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.4.0/gl-matrix.js"></script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-546// Your WebGL initialization code here
+// Your WebGL initialization code here
 
 // Define L-system rules and initial axiom
 const rules = {
@@ -19,14 +19,14 @@ function interpretLSystem(lSystemString) {
     // Your interpretation and drawing code here
 }
 
-// Set up WebGL rendering context and call L-system functions
-window.onload = function () {
-    // Your WebGL setup code here
+// // Set up WebGL rendering context and call L-system functions
+// window.onload = function () {
+//     // Your WebGL setup code here
 
-    const iterations = 2; // Adjust as needed
-    const lSystemString = generateLSystemString(iterations);
-    interpretLSystem(lSystemString);
+//     const iterations = 2; // Adjust as needed
+//     const lSystemString = generateLSystemString(iterations);
+//     interpretLSystem(lSystemString);
 
-    console.log(lSystemString);
-    alert(lSystemString);
-};
+//     console.log(lSystemString);
+//     alert(lSystemString);
+// };

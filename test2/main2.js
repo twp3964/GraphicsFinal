@@ -59,27 +59,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const positionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
-
-    // const positions = [
-    //     // First square
-    //     -2.0, 0.0, -1.0,
-    //     2.0, 0.0, -1.0,
-    //     -2.0, 0.0, -100.0,
-    //     2.0, 0.0, -100.0
-
-    //     // // Second square
-    //     // -3.0, 0.0, -3.0,
-    //     // -1.0, 0.0, -3.0,
-    //     // -3.0, 0.0, -1.0,
-    //     // -1.0, 0.0, -1.0,
-
-    //     // // Third square
-    //     // 1.0, 0.0, -3.0,
-    //     // 3.0, 0.0, -3.0,
-    //     // 1.0, 0.0, -1.0,
-    //     // 3.0, 0.0, -1.0,
-    // ];
-
     // POSITION GENERATOR
 
     //left to right and then right to left
@@ -127,33 +106,53 @@ document.addEventListener("DOMContentLoaded", function () {
             const scl4 = 0.75;
             const scl5 = 1.25;
 
+            // if ((x == -2) || (x == 2)){
+            //     y00 = y00 * scl5;
+            //     y01 = y01 * scl5;
+            //     y10 = y10 * scl5;
+            //     y11 = y11 * scl5;
 
+            //     positions.push(x0, y00, z0);
+            //     positions.push(x1, y10, z0);
+            //     positions.push(x0, y01, z1);
+        
+            //     positions.push(x0, y01, z1);
+            //     positions.push(x1, y10, z0);
+            //     positions.push(x1, y11, z1);
+    
+            //     verticies+=6;
+
+            //     console.log('hi');
+            // }
+            
             if (x < 2 && x > -2){
                 y00 = y00 * scl1;
                 y01 = y01 * scl1;
                 y10 = y10 * scl1;
                 y11 = y11 * scl1;
-            }else if (x < 2 && x > -2){
-                y00 = y00 * scl2;
-                y01 = y01 * scl2;
-                y10 = y10 * scl2;
-                y11 = y11 * scl2;
-            }else if (x < 3 && x > -3){
-                y00 = y00 * scl3;
-                y01 = y01 * scl3;
-                y10 = y10 * scl3;
-                y11 = y11 * scl3;
-            }else if (x < 4 && x > -4){
-                y00 = y00 * scl4;
-                y01 = y01 * scl4;
-                y10 = y10 * scl4;
-                y11 = y11 * scl4;
             }else{
                 y00 = y00 * scl5;
                 y01 = y01 * scl5;
                 y10 = y10 * scl5;
                 y11 = y11 * scl5;
             }
+
+            // else if (x < 2 && x > -2){
+            //     y00 = y00 * scl2;
+            //     y01 = y01 * scl2;
+            //     y10 = y10 * scl2;
+            //     y11 = y11 * scl2;
+            // }else if (x < 3 && x > -3){
+            //     y00 = y00 * scl3;
+            //     y01 = y01 * scl3;
+            //     y10 = y10 * scl3;
+            //     y11 = y11 * scl3;
+            // }else if (x < 4 && x > -4){
+            //     y00 = y00 * scl4;
+            //     y01 = y01 * scl4;
+            //     y10 = y10 * scl4;
+            //     y11 = y11 * scl4;
+            // }
 
 
     
@@ -187,8 +186,8 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     function render() {
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         gl.clearColor(112.0/256,128.0/256,144.0/256,1.0)
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         const modelViewMatrix = mat4.create();
         const projectionMatrix = mat4.create();
@@ -205,7 +204,25 @@ document.addEventListener("DOMContentLoaded", function () {
         gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrix, false, modelViewMatrix);
         gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
 
-        gl.drawArrays(gl.LINES, 0, verticies);;
+
+        const texture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        
+        // Upload image data to the texture
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+        gl.generateMipmap(gl.TEXTURE_2D);
+        
+        // Set texture parameters
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        
+
+        gl.drawArrays(gl.LINES, 0, verticies);
+        console.log(verticies);
+
+
+
+
 
 
         requestAnimationFrame(render);
