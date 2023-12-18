@@ -173,11 +173,11 @@ document.addEventListener("DOMContentLoaded", function () {
     let triangleVerticiesStart = verticies;
     let triangleVerticiesEnd = verticies;
 
-    const grassHeight = 0.3; // Adjust the height of the grass as needed
+    const grassHeight = 0.2; // Adjust the height of the grass as needed
 
     for (let x = -gridSize / 2; x <= gridSize / 2; x++) {
         for (let z = -gridSize / 2; z <= gridSize / 2; z++) {
-            if (x >= -2 && x <= 2 && z >= -100 && z <= 100 && x % 1 === 0) {
+            if (x >= -1 && x <= 1 && z >= -100 && z <= 100 && x % 1 === 0) {
                 // Logic for creating grass triangles at specific intervals within the road area
                 const lineHeight = 0.5; // Set the height of the ground
                 const bladeCount = 5; // Number of grass blades at each point
