@@ -62,7 +62,7 @@ function drawTree(x, y, z) {
   beginShape();
   for (let i = 0; i < treeHeight; i += 5) {
     let noiseValue = perlin.get(i * 0.1, 0); // Use Perlin noise for variation
-    let radius = map(noiseValue, 0, 1, baseRadius / 2, baseRadius); // Vary the radius based on Perlin noise
+    let radius = map(noiseValue, 0, 1, baseRadius / 4, baseRadius); // Vary the radius based on Perlin noise
     let angle = map(i, 0, treeHeight, 0, TWO_PI);
 
     let xOffset = cos(angle) * radius;
@@ -75,24 +75,27 @@ function drawTree(x, y, z) {
   noStroke();
   fill(34, 139, 34); // Set the color for the leaves
 
-  let leafLength = 30; // Set the length of the leaves
-  let leafWidth = 8; // Set the width of the leaves
   let leavesCount = 8; // Set the number of leaves
+  let leafWidth = 8; // Set the width of the leaves
+  let leafHeight = 20; // Set the height of the leaves
 
   // Move to the top of the trunk to draw the leaves
   translate(0, -treeHeight / 2, 0);
 
   for (let i = 0; i < leavesCount; i++) {
-    let angle = map(i, 0, leavesCount, 0, TWO_PI);
-    let xOffset = cos(angle) * baseRadius * 1.5;
-    let zOffset = sin(angle) * baseRadius * 1.5;
+    let angleX = random(-PI, PI); // Random angle for rotation around x-axis
+    let angleZ = random(-PI, PI); // Random angle for rotation around z-axis
+    let xOffset = cos(angleX) * baseRadius * 1.5;
+    let zOffset = sin(angleZ) * baseRadius * 1.5;
 
     push();
     translate(xOffset, 0, zOffset);
-    rotateY(angle + HALF_PI); // Orient the leaves outward
+    rotateY(random(TWO_PI)); // Random orientation around y-axis
+    rotateX(angleX); // Apply the random rotation around x-axis
+    rotateZ(angleZ); // Apply the random rotation around z-axis
 
-    // Draw leaves as ellipsoids or any other desired shape
-    ellipsoid(leafLength, leafWidth, leafWidth * 0.5);
+    // Draw ellipsoid leaves
+    ellipsoid(leafWidth, leafWidth * 0.5, leafHeight);
     pop();
   }
   pop();
@@ -152,7 +155,7 @@ function gotKey(event) {
     case 's':
       camZ += step;
       camLookZ += step;
-      zRoad -= step;
+      zRoad += step;
       break;
     case 'a':
       camX = cos(-rotationAngle) * (camX - camLookX) - sin(-rotationAngle) * (camZ - camLookZ) + camLookX;
