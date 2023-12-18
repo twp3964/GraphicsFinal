@@ -173,7 +173,8 @@ document.addEventListener("DOMContentLoaded", function () {
     let triangleVerticiesStart = verticies;
     let triangleVerticiesEnd = verticies;
 
-    const grassHeight = 0.2; // Adjust the height of the grass as needed
+    // Grass heights
+    const grassHeight = 0.2; 
 
     for (let x = -gridSize / 2; x <= gridSize / 2; x++) {
         for (let z = -gridSize / 2; z <= gridSize / 2; z++) {
