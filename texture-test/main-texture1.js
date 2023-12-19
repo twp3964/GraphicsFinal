@@ -154,9 +154,17 @@ window.onload = function () {
     mat4.translate(modelViewMatrix, modelViewMatrix, [0.0, 0.0, -2.0]);
 
     // Multiply the projection and model-view matrices
-    var modelViewProjectionMatrix = new Float32Array(16);
+    var modelViewProjectionMatrix = mat4.create();
     mat4.multiply(modelViewProjectionMatrix, projectionMatrix, modelViewMatrix);
+
+    // Get the uniform location for the model-view-projection matrix
+    var mvpLocation = gl.getUniformLocation(program, "u_modelViewProjection");
+    gl.uniformMatrix4fv(mvpLocation, false, modelViewProjectionMatrix);
  ////////
+
+   // Clear the canvas
+   gl.clear(gl.COLOR_BUFFER_BIT);
+   gl.clearColor(0.0, 0.0, 0.0, 0.0);
 
     // Create a buffer and put the vertices in it
     var vertexBuffer = gl.createBuffer();
@@ -191,8 +199,6 @@ window.onload = function () {
     };
     image.src = 'texture-floor.jpg'; // Change the path to your image
 
-    // Clear the canvas
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.clearColor(20.0, 20.0, 20.0, 1.0);
+ 
 
 };
