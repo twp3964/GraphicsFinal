@@ -56,8 +56,8 @@ let perlin = {
 perlin.seed();
 
 function drawTree(x, y, z) {
-  let treeHeight = 100; // Set the height of the tree
-  let baseRadius = 10; // Set the base radius of the tree trunk
+  let treeHeight = 100; 
+  let baseRadius = 10; 
 
   push();
   translate(x, y - treeHeight / 2, z); // Adjust the starting position of the tree
@@ -65,8 +65,8 @@ function drawTree(x, y, z) {
   // Create the tree trunk using Perlin noise
   beginShape();
   for (let i = 0; i < treeHeight; i += 5) {
-    let noiseValue = perlin.get(i * 0.1, 0); // Use Perlin noise for variation
-    let radius = map(noiseValue, 0, 1, baseRadius / 4, baseRadius); // Vary the radius based on Perlin noise
+    let noiseValue = perlin.get(i * 0.1, 0); 
+    let radius = map(noiseValue, 0, 1, baseRadius / 4, baseRadius); 
     let angle = map(i, 0, treeHeight, 0, TWO_PI);
 
     let xOffset = cos(angle) * radius;
@@ -79,24 +79,24 @@ function drawTree(x, y, z) {
   noStroke();
   fill(34, 139, 34); // Set the color for the leaves
 
-  let leavesCount = 8; // Set the number of leaves
-  let leafWidth = 8; // Set the width of the leaves
-  let leafHeight = 20; // Set the height of the leaves
+  let leavesCount = 8; 
+  let leafWidth = 8;
+  let leafHeight = 20; 
 
   // Move to the top of the trunk to draw the leaves
   translate(0, -treeHeight / 2, 0);
 
   for (let i = 0; i < leavesCount; i++) {
-    let angleX = random(-PI, PI); // Random angle for rotation around x-axis
-    let angleZ = random(-PI, PI); // Random angle for rotation around z-axis
+    let angleX = random(-PI, PI); 
+    let angleZ = random(-PI, PI); 
     let xOffset = cos(angleX) * baseRadius * 1.5;
     let zOffset = sin(angleZ) * baseRadius * 1.5;
 
     push();
     translate(xOffset, 0, zOffset);
-    rotateY(random(TWO_PI)); // Random orientation around y-axis
-    rotateX(angleX); // Apply the random rotation around x-axis
-    rotateZ(angleZ); // Apply the random rotation around z-axis
+    rotateY(random(TWO_PI));
+    rotateX(angleX);
+    rotateZ(angleZ); 
 
     // Draw ellipsoid leaves
     texture(leafTexture);
@@ -121,7 +121,7 @@ function setup() {
 
   let xoff = 0.0;
   let yoff = 0.0;
-  let scl_off = 0.1; // Adjust the scale offset for smoother changes
+  let scl_off = 0.1;
   let counter = 0;
 
   for (let x = -300; x < 300; x += 20) {
@@ -130,7 +130,6 @@ function setup() {
       translate(x, 0, z);
 
       if (x < 60 && x > -60) {
-        //texture(cubeTexture);
         box(20, 20, 20);
         if ((x == 20 || x == -20) && counter > 2){
           texture(treeTexture);
@@ -139,7 +138,7 @@ function setup() {
         }
       } 
       else {
-        let boxHeight = map(perlin.get(xoff, yoff), 0, 1, 0, 200); // Adjust mapping range for varied heights
+        let boxHeight = map(perlin.get(xoff, yoff), 0, 1, 0, 200); 
         texture(cubeTexture);
         box(20, boxHeight, 20);
       }
@@ -154,8 +153,9 @@ function setup() {
 window.addEventListener('keydown', gotKey, false);
 
 function gotKey(event) {
-  const step = 20; // Set the step value for movement
-  const rotationAngle = 0.1; // Set the angle for rotation
+  // Chanable variables for the camera
+  const step = 20; 
+  const rotationAngle = 0.1; 
 
   switch (event.key) {
     case 'w':

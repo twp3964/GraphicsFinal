@@ -59,27 +59,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const positionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
-
-    // const positions = [
-    //     // First square
-    //     -2.0, 0.0, -1.0,
-    //     2.0, 0.0, -1.0,
-    //     -2.0, 0.0, -100.0,
-    //     2.0, 0.0, -100.0
-
-    //     // // Second square
-    //     // -3.0, 0.0, -3.0,
-    //     // -1.0, 0.0, -3.0,
-    //     // -3.0, 0.0, -1.0,
-    //     // -1.0, 0.0, -1.0,
-
-    //     // // Third square
-    //     // 1.0, 0.0, -3.0,
-    //     // 3.0, 0.0, -3.0,
-    //     // 1.0, 0.0, -1.0,
-    //     // 3.0, 0.0, -1.0,
-    // ];
-
     // POSITION GENERATOR
 
     //left to right and then right to left
@@ -122,9 +101,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             const scl1 = 0.0;
-            const scl2 = 0.1;
-            const scl3 = 0.25;
-            const scl4 = 0.75;
             const scl5 = 1.25;
 
 
@@ -140,9 +116,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 y11 = y11 * scl5;
             }
 
-
-    
-            // Add the vertices for the tile with the Perlin noise applied to Y values
             positions.push(x0, y00, z0);
             positions.push(x1, y10, z0);
             positions.push(x0, y01, z1);
@@ -165,30 +138,30 @@ document.addEventListener("DOMContentLoaded", function () {
     for (let x = -gridSize / 2; x <= gridSize / 2; x++) {
         for (let z = -gridSize / 2; z <= gridSize / 2; z++) {
             if ((x === -1 || x === 1) && z >= -100 && z <= 100 && x % 1 === 0) {
-                const lineHeight = 0.5; // Set the height of the ground
-                const bladeCount = 5; // Number of grass blades at each point
 
+                const bladeCount = 5; 
                 for (let i = 0; i < bladeCount; i++) {
-                    const xOffset = (Math.random() - 0.5) * 0.5; // Randomize X position
-                    const zOffset = (Math.random() - 0.5) * 0.5; // Randomize Z position
-
-                    // Define the base position for each blade of grass
+                    // Setting grass
+                    const xOffset = (Math.random() - 0.5) * 0.5;
+                    const zOffset = (Math.random() - 0.5) * 0.5;
                     const x0 = (x + xOffset) * tileSize;
                     const z0 = (z + zOffset) * tileSize;
-                    const x1 = x0 - 0.05; // Define the width of the grass blade
-                    const z1 = z0 + 0.1;  // Set the length of the grass blade
+
+                    // Height and Width of grass
+                    const x1 = x0 - 0.05; 
+                    const z1 = z0 + 0.1;  
                     
                     // Set the Y-values for the grass blade
                     const grassHeight = Math.random() * (maxGrassHeight - minGrassHeight) + minGrassHeight;
                     const y00 = 0;
                     const y01 = 0 + grassHeight;
 
-                    // Add vertices for the grass blade triangles
+                    // Push triangles
                     positions.push(x0, y00, z0);
                     positions.push(x1, y01, z1);
-                    positions.push(x0 + 0.05, y00, z0); // Define the other edge of the triangle
+                    positions.push(x0 + 0.05, y00, z0);
 
-                    triangleVerticiesEnd += 3; // Update the number of vertices added for each triangle
+                    triangleVerticiesEnd += 3; 
                 }
             }
         }
@@ -335,7 +308,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const forwardX = Math.sin(cameraRotation);
         const forwardZ = -Math.cos(cameraRotation);
     
-        // Translate along the camera's forward direction (W and S keys)
+        // Translate the camera 
         if (key === 'w') {
             cameraPosition[0] -= forwardX * 0.1; // Move forward in X
             cameraPosition[2] += forwardZ * 0.1; // Move forward in Z
@@ -344,11 +317,11 @@ document.addEventListener("DOMContentLoaded", function () {
             cameraPosition[2] -= forwardZ * 0.1; // Move backward in Z
         }
     
-        // Rotate around Y-axis (A and D keys)
+        // Rotate around Y-axis 
         if (key === 'a') {
-            cameraRotation += 0.05; // Rotate left
+            cameraRotation += 0.05; 
         } else if (key === 'd') {
-            cameraRotation -= 0.05; // Rotate right
+            cameraRotation -= 0.05;
         }
     }
 
@@ -361,7 +334,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const modelViewMatrix = new Float32Array(16);
         const projectionMatrix = new Float32Array(16);
     
-        const eye = cameraPosition; // Set the eye position to the camera position
+        const eye = cameraPosition;
         const center = [0, 4, 0];
         const up = [0, 1, 0];
     
@@ -372,10 +345,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const near = 0.1;
         const far = 100.0;
     
-        // Apply translation to the camera
         translate(modelViewMatrix, -eye[0], -eye[1], -eye[2]);
-    
-        // Apply rotation around the Y-axis to the camera
+
         rotateY(modelViewMatrix, cameraRotation);
     
         perspective(projectionMatrix, fieldOfView, aspect, near, far);
@@ -388,19 +359,6 @@ document.addEventListener("DOMContentLoaded", function () {
     
         gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrix, false, modelViewMatrix);
         gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
-
-
-        // const texture = gl.createTexture();
-        // gl.bindTexture(gl.TEXTURE_2D, texture);
-        
-        // // Upload image data to the texture
-        // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-        // gl.generateMipmap(gl.TEXTURE_2D);
-        
-        // // Set texture parameters
-        // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        
 
         gl.drawArrays(gl.LINES, 0, verticies);
         gl.drawArrays(gl.TRIANGLES, triangleVerticiesStart, triangleVerticiesEnd);

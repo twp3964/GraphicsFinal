@@ -59,88 +59,13 @@ window.onload = function () {
         return;
     }
 
-    function multiply(out, a, b) {
-        var a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3];
-        var a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7];
-        var a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11];
-        var a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15];
-    
-        var b00 = b[0], b01 = b[1], b02 = b[2], b03 = b[3];
-        var b10 = b[4], b11 = b[5], b12 = b[6], b13 = b[7];
-        var b20 = b[8], b21 = b[9], b22 = b[10], b23 = b[11];
-        var b30 = b[12], b31 = b[13], b32 = b[14], b33 = b[15];
-    
-        out[0] = a00 * b00 + a01 * b10 + a02 * b20 + a03 * b30;
-        out[1] = a00 * b01 + a01 * b11 + a02 * b21 + a03 * b31;
-        out[2] = a00 * b02 + a01 * b12 + a02 * b22 + a03 * b32;
-        out[3] = a00 * b03 + a01 * b13 + a02 * b23 + a03 * b33;
-    
-        out[4] = a10 * b00 + a11 * b10 + a12 * b20 + a13 * b30;
-        out[5] = a10 * b01 + a11 * b11 + a12 * b21 + a13 * b31;
-        out[6] = a10 * b02 + a11 * b12 + a12 * b22 + a13 * b32;
-        out[7] = a10 * b03 + a11 * b13 + a12 * b23 + a13 * b33;
-    
-        out[8] = a20 * b00 + a21 * b10 + a22 * b20 + a23 * b30;
-        out[9] = a20 * b01 + a21 * b11 + a22 * b21 + a23 * b31;
-        out[10] = a20 * b02 + a21 * b12 + a22 * b22 + a23 * b32;
-        out[11] = a20 * b03 + a21 * b13 + a22 * b23 + a23 * b33;
-    
-        out[12] = a30 * b00 + a31 * b10 + a32 * b20 + a33 * b30;
-        out[13] = a30 * b01 + a31 * b11 + a32 * b21 + a33 * b31;
-        out[14] = a30 * b02 + a31 * b12 + a32 * b22 + a33 * b32;
-        out[15] = a30 * b03 + a31 * b13 + a32 * b23 + a33 * b33;
-    
-        return out;
-    }
-
-    
-    function perspective(out, fovy, aspect, near, far) {
-        var f = 1.0 / Math.tan(fovy / 2);
-        out[0] = f / aspect;
-        out[5] = f;
-        out[10] = (far + near) / (near - far);
-        out[11] = -1;
-        out[14] = (2 * far * near) / (near - far);
-        out[15] = 0;
-        return out;
-    }
-    
-    function translate(out, v, scalar) {
-        out[12] = v[0] * scalar[0];
-        out[13] = v[1] * scalar[1];
-        out[14] = v[2] * scalar[2];
-    }
-
     gl.useProgram(program);
 
-    // // Define vertices and texture coordinates
-    // var vertices = new Float32Array([
-    //     -0.5, -0.5, 0.0, 1.0,
-    //      0.5, -0.5, 1.0, 1.0,
-    //      0.0,  0.5, 0.5, 0.0,
-
-
-    //      -1.5, -1.5, 0.0, 1.0,
-    //      1.5, -1.5, 1.0, 1.0,
-    //      1.0,  1.5, 0.5, 0.0
-    // ]);
-
-    // Update the vertices to include z coordinates
     var vertices = new Float32Array([
         -0.0, 0.0, 0.0, 0.0, 1.0,  // Vertex 1
         0.5, -0.5, 0.0, 1.0, 1.0,  // Vertex 2
         -0.5,  0.5, 0.0, 0.5, 0.0,   // Vertex 3
     ]);
-///////
-    // // Set up perspective projection
-    // var projectionMatrix = mat4.create();
-    // var fieldOfView = Math.PI / 4;
-    // var aspect = canvas.width / canvas.height;
-    // var zNear = 0.1;
-    // var zFar = 10.0;
-    // mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
-
-
     // Set up perspective projection
     var projectionMatrix = new Float32Array(16);
     var fieldOfView = Math.PI / 4;
@@ -148,19 +73,12 @@ window.onload = function () {
     var zNear = 0.1;
     var zFar = 10.0;
     mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
-
-    // Set up model-view matrix (position the camera)
     var modelViewMatrix = mat4.create();
     mat4.translate(modelViewMatrix, modelViewMatrix, [0.0, 0.0, -2.0]);
-
-    // Multiply the projection and model-view matrices
     var modelViewProjectionMatrix = mat4.create();
     mat4.multiply(modelViewProjectionMatrix, projectionMatrix, modelViewMatrix);
-
-    // Get the uniform location for the model-view-projection matrix
     var mvpLocation = gl.getUniformLocation(program, "u_modelViewProjection");
     gl.uniformMatrix4fv(mvpLocation, false, modelViewProjectionMatrix);
- ////////
 
    // Clear the canvas
    gl.clear(gl.COLOR_BUFFER_BIT);
@@ -193,7 +111,7 @@ window.onload = function () {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.uniform1i(textureLocation, 0); // Set the texture unit to 0
+        gl.uniform1i(textureLocation, 0); 
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
     };
