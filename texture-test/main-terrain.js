@@ -180,8 +180,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     
                     // Set the Y-values for the grass blade
                     const grassHeight = Math.random() * (maxGrassHeight - minGrassHeight) + minGrassHeight;
-                    const y00 = lineHeight;
-                    const y01 = lineHeight + grassHeight;
+                    const y00 = 0;
+                    const y01 = 0 + grassHeight;
 
                     // Add vertices for the grass blade triangles
                     positions.push(x0, y00, z0);
