@@ -1,6 +1,6 @@
 window.onload = function () {
     // Get the WebGL context
-    var canvas = document.getElementById("webgl-canvas1");
+    var canvas = document.getElementById("webgl-canvas3");
     var gl = canvas.getContext("webgl");
 
     if (!gl) {
@@ -127,9 +127,9 @@ window.onload = function () {
 
     // Update the vertices to include z coordinates
     var vertices = new Float32Array([
-        -0.5, -0.5, 0.0, 0.0, 1.0,  // Vertex 1
-            0.5, -0.5, 0.0, 1.0, 1.0,  // Vertex 2
-            0.0,  0.5, 0.0, 0.5, 0.0,   // Vertex 3
+            10, 10, 0.0, 0.0, 1.0,  // Vertex 1
+            -10, 10, 0.0, 1.0, 1.0,  // Vertex 2
+            0.0, -10, 0.0, 0.5, 0.0,   // Vertex 3
     ]);
 ///////
     // // Set up perspective projection
@@ -203,6 +203,6 @@ window.onload = function () {
 
     // Clear the canvas
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clearColor(256.0, 256.0, 256.0, 1.0);
 
 };
