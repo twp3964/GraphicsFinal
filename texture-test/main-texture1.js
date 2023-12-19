@@ -199,6 +199,53 @@ window.onload = function () {
     };
     image.src = 'texture-floor.jpg'; // Change the path to your image
 
+        // Define vertices and attributes for the second shape (a box)
+        var vertices2 = new Float32Array([
+            // Define vertices for a square
+            -0.5, -0.5,
+             0.5, -0.5,
+            -0.5,  0.5,
+            
+            -0.5,  0.5,
+             0.5, -0.5,
+             0.5,  0.5
+        ]);
+        
+        // Create buffer for the second shape (box)
+        var vertexBuffer2 = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer2);
+        gl.bufferData(gl.ARRAY_BUFFER, vertices2, gl.STATIC_DRAW);
+        
+        // Get attribute locations for the second shape (box)
+        var positionLocation2 = gl.getAttribLocation(program, "a_position");
+        gl.vertexAttribPointer(positionLocation2, 2, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(positionLocation2);
+        
+        // Create a texture for the second shape (box)
+        var texture2 = gl.createTexture();
+        var image2 = new Image();
+        image2.onload = function () {
+            gl.bindTexture(gl.TEXTURE_2D, texture2);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image2);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        
+            // Set the transformation for the second shape (box) to position it in -x direction
+            var modelViewMatrix2 = mat4.create();
+            mat4.translate(modelViewMatrix2, modelViewMatrix2, [-2.0, 0.0, -2.0]); // Translate to -x direction
+            var modelViewProjectionMatrix2 = new Float32Array(16);
+            mat4.multiply(modelViewProjectionMatrix2, projectionMatrix, modelViewMatrix2);
+            var mvpLocation2 = gl.getUniformLocation(program, "u_modelViewProjection");
+            gl.uniformMatrix4fv(mvpLocation2, false, modelViewProjectionMatrix2);
+        
+            // Draw the second shape (box)
+            gl.drawArrays(gl.TRIANGLES, 0, 6);
+        };
+        image2.src = 'leafTexture.jpeg'; // Path to the second texture
+        
+
  
 
 };
