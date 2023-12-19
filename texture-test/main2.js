@@ -156,7 +156,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     let triangleVerticiesStart = verticies;
-    let triangleVerticiesEnd = verticies;
+    let triangleVerticiesEnd = 0;
 
     // Grass heights
     const grassHeight = 0.2; 
