@@ -173,13 +173,13 @@ document.addEventListener("DOMContentLoaded", function () {
     let triangleVerticiesStart = verticies;
     let triangleVerticiesEnd = verticies;
 
-    // Grass heights
-    const grassHeight = 0.2; 
+        // Grass heights
+    const minGrassHeight = 0.1;
+    const maxGrassHeight = 0.5;
 
     for (let x = -gridSize / 2; x <= gridSize / 2; x++) {
         for (let z = -gridSize / 2; z <= gridSize / 2; z++) {
-            if (x >= -1 && x <= 1 && z >= -100 && z <= 100 && x % 1 === 0) {
-                // Logic for creating grass triangles at specific intervals within the road area
+            if ((x === -1 || x === 1) && z >= -100 && z <= 100 && x % 1 === 0) {
                 const lineHeight = 0.5; // Set the height of the ground
                 const bladeCount = 5; // Number of grass blades at each point
 
@@ -193,7 +193,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     const x1 = x0 - 0.05; // Define the width of the grass blade
                     const z1 = z0 + 0.1;  // Set the length of the grass blade
                     
-                    // Set the Y-values for the grass blade
+                    // Set the Y-values for the grass blade (randomized within specified range)
+                    const grassHeight = Math.random() * (maxGrassHeight - minGrassHeight) + minGrassHeight;
                     const y00 = lineHeight;
                     const y01 = lineHeight + grassHeight;
 
@@ -207,6 +208,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
     }
+
 
 
 

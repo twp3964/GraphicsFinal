@@ -81,24 +81,24 @@ window.onload = function () {
     ]);
 ///////
     // Set up perspective projection
-    var projectionMatrix = mat4.create();
+    var projectionMatrix = new Float32Array(16);
     var fieldOfView = Math.PI / 4;
     var aspect = canvas.width / canvas.height;
     var zNear = 0.1;
     var zFar = 10.0;
-    mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
+    glMatrix.mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
 
-    // Set up model-view matrix (position the camera)
-    var modelViewMatrix = mat4.create();
-    mat4.translate(modelViewMatrix, modelViewMatrix, [0.0, 0.0, -2.0]);
+    // Create model-view matrix for translation
+    var modelViewMatrix = new Float32Array(16);
+    glMatrix.mat4.identity(modelViewMatrix); // Initialize as identity matrix
+
+    // Translate the model-view matrix (position the camera)
+    var translation = new Float32Array([0.0, 0.0, -2.0]);
+    glMatrix.mat4.translate(modelViewMatrix, modelViewMatrix, translation);
 
     // Multiply the projection and model-view matrices
-    var modelViewProjectionMatrix = mat4.create();
-    mat4.multiply(modelViewProjectionMatrix, projectionMatrix, modelViewMatrix);
-
-    // Get the uniform location for the model-view-projection matrix
-    var mvpLocation = gl.getUniformLocation(program, "u_modelViewProjection");
-    gl.uniformMatrix4fv(mvpLocation, false, modelViewProjectionMatrix);
+    var modelViewProjectionMatrix = new Float32Array(16);
+    glMatrix.mat4.multiply(modelViewProjectionMatrix, projectionMatrix, modelViewMatrix);
  ////////
 
     // Create a buffer and put the vertices in it
