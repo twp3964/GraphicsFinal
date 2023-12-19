@@ -179,6 +179,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     const z1 = z0 + 0.1;  // Set the length of the grass blade
                     
                     // Set the Y-values for the grass blade
+                    const grassHeight = Math.random() * (maxGrassHeight - minGrassHeight) + minGrassHeight;
                     const y00 = lineHeight;
                     const y01 = lineHeight + grassHeight;
 

@@ -155,7 +155,7 @@ window.onload = function () {
 
     // Multiply the projection and model-view matrices
     var modelViewProjectionMatrix = new Float32Array(16);
-    glMatrix.mat4.multiply(modelViewProjectionMatrix, projectionMatrix, modelViewMatrix);
+    mat4.multiply(modelViewProjectionMatrix, projectionMatrix, modelViewMatrix);
  ////////
 
     // Create a buffer and put the vertices in it
