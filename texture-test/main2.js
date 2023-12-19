@@ -133,21 +133,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 y01 = y01 * scl1;
                 y10 = y10 * scl1;
                 y11 = y11 * scl1;
-            }else if (x < 2 && x > -2){
-                y00 = y00 * scl2;
-                y01 = y01 * scl2;
-                y10 = y10 * scl2;
-                y11 = y11 * scl2;
-            }else if (x < 3 && x > -3){
-                y00 = y00 * scl3;
-                y01 = y01 * scl3;
-                y10 = y10 * scl3;
-                y11 = y11 * scl3;
-            }else if (x < 4 && x > -4){
-                y00 = y00 * scl4;
-                y01 = y01 * scl4;
-                y10 = y10 * scl4;
-                y11 = y11 * scl4;
             }else{
                 y00 = y00 * scl5;
                 y01 = y01 * scl5;
@@ -171,7 +156,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     let triangleVerticiesStart = verticies;
-    let triangleVerticiesEnd = verticies;
+    let triangleVerticiesEnd = 0;
 
     // Grass heights
     const minGrassHeight = 0.1;
@@ -193,8 +178,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     const x1 = x0 - 0.05; // Define the width of the grass blade
                     const z1 = z0 + 0.1;  // Set the length of the grass blade
                     
-                    // Set the Y-values for the grass blade (randomized within specified range)
-                    const grassHeight = Math.random() * (maxGrassHeight - minGrassHeight) + minGrassHeight;
+                    // Set the Y-values for the grass blade
                     const y00 = lineHeight;
                     const y01 = lineHeight + grassHeight;
 
@@ -395,7 +379,6 @@ document.addEventListener("DOMContentLoaded", function () {
     
         perspective(projectionMatrix, fieldOfView, aspect, near, far);
     
-        // (Your remaining WebGL rendering code...)
     
         gl.useProgram(programInfo.program);
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);

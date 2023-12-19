@@ -1,6 +1,6 @@
 window.onload = function () {
     // Get the WebGL context
-    var canvas = document.getElementById("webgl-canvas1");
+    var canvas = document.getElementById("webgl-canvas3");
     var gl = canvas.getContext("webgl");
 
     if (!gl) {
@@ -127,9 +127,9 @@ window.onload = function () {
 
     // Update the vertices to include z coordinates
     var vertices = new Float32Array([
-        -0.5, -0.5, 0.0, 0.0, 1.0,  // Vertex 1
-            0.5, -0.5, 0.0, 1.0, 1.0,  // Vertex 2
-            0.0,  0.5, 0.0, 0.5, 0.0,   // Vertex 3
+            10, 10, 0.0, 0.0, 1.0,  // Vertex 1
+            -10, 10, 0.0, 1.0, 1.0,  // Vertex 2
+            0.0, -10, 0.0, 0.5, 0.0,   // Vertex 3
     ]);
 ///////
     // // Set up perspective projection
@@ -147,15 +147,25 @@ window.onload = function () {
     var aspect = canvas.width / canvas.height;
     var zNear = 0.1;
     var zFar = 10.0;
-    mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
+    perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
 
-    // Set up model-view matrix (position the camera)
+
+    // // Set up model-view matrix (position the camera)
     var modelViewMatrix = mat4.create();
     mat4.translate(modelViewMatrix, modelViewMatrix, [0.0, 0.0, -2.0]);
 
+    // Set up model-view matrix (position the camera)
+    // var modelViewMatrix = new Float32Array(16);
+    // translate(modelViewMatrix, modelViewMatrix,[0.0, 0.0, -2.0]);
+
+
     // Multiply the projection and model-view matrices
-    var modelViewProjectionMatrix = new Float32Array(16);
-    glMatrix.mat4.multiply(modelViewProjectionMatrix, projectionMatrix, modelViewMatrix);
+    var modelViewProjectionMatrix = mat4.create();
+    mat4.multiply(modelViewProjectionMatrix, projectionMatrix, modelViewMatrix);
+
+    // Get the uniform location for the model-view-projection matrix
+    var mvpLocation = gl.getUniformLocation(program, "u_modelViewProjection");
+    gl.uniformMatrix4fv(mvpLocation, false, modelViewProjectionMatrix);
  ////////
 
     // Create a buffer and put the vertices in it
@@ -193,6 +203,6 @@ window.onload = function () {
 
     // Clear the canvas
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clearColor(256.0, 256.0, 256.0, 1.0);
 
 };
