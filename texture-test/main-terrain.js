@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const positionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
-    // POSITION GENERATOR
+    // POSITION GENERATOR for floor
 
     //left to right and then right to left
     const gridSize = 100; // Adjust the size of the grid as needed
@@ -84,6 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
             let y10 = perlinNoise(x1 / divFactor, z0 / divFactor);
             let y11 = perlinNoise(x1 / divFactor, z1 / divFactor);
             
+            // dont' allow negative y values
             if (y00 < 0){
                 y00 = 0;
             }
@@ -103,7 +104,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const scl1 = 0.0;
             const scl5 = 1.25;
 
-
+            // makes the "road" in the middle flat
             if (x < 2 && x > -2){
                 y00 = y00 * scl1;
                 y01 = y01 * scl1;
