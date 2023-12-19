@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const canvas = document.getElementById("webgl-canvas2");
+    const canvas = document.getElementById("webgl-canvas-terrian");
     const gl = canvas.getContext("webgl");
 
     if (!gl) {
