@@ -1,6 +1,6 @@
 window.onload = function () {
     // Get the WebGL context
-    var canvas = document.getElementById("webgl-canvas-texture2");
+    var canvas = document.getElementById("webgl-canvas-texture1");
     var gl = canvas.getContext("webgl");
 
     if (!gl) {
@@ -127,9 +127,9 @@ window.onload = function () {
 
     // Update the vertices to include z coordinates
     var vertices = new Float32Array([
-        -0.0, 0.0, 0.0, 0.0, 1.0,  // Vertex 1
-        0.8, -0.8, 0.0, 1.0, 1.0,  // Vertex 2
-        -0.8,  0.8, 0.0, 0.5, 0.0,   // Vertex 3
+        -0.2, 0.0, 0.0, 0.0, 1.0,  // Vertex 1
+        0.5, -0.5, 0.0, 1.0, 1.0,  // Vertex 2
+        -0.5,  0.5, 0.0, 0.5, 0.0,   // Vertex 3
     ]);
 ///////
     // // Set up perspective projection
@@ -147,7 +147,7 @@ window.onload = function () {
     var aspect = canvas.width / canvas.height;
     var zNear = 0.1;
     var zFar = 10.0;
-    mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
+    perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar);
 
 
     // // Set up model-view matrix (position the camera)
@@ -167,10 +167,6 @@ window.onload = function () {
     var mvpLocation = gl.getUniformLocation(program, "u_modelViewProjection");
     gl.uniformMatrix4fv(mvpLocation, false, modelViewProjectionMatrix);
  ////////
-
-     // Clear the canvas
-     gl.clear(gl.COLOR_BUFFER_BIT);
-     gl.clearColor(0.0, 0.0, 0.0, 0.0);
 
     // Create a buffer and put the vertices in it
     var vertexBuffer = gl.createBuffer();
@@ -203,8 +199,10 @@ window.onload = function () {
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
     };
-    image.src = 'leafTexture.jpeg'; // Change the path to your image
+    image.src = 'texture-floor.jpg'; // Change the path to your image
 
-
+    // Clear the canvas
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
 };
