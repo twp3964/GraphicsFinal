@@ -179,8 +179,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     const z1 = z0 + 0.1;  // Set the length of the grass blade
                     
                     // Set the Y-values for the grass blade
-                    const y00 = lineHeight;
-                    const y01 = lineHeight + grassHeight;
+                    const y00 = 0;
+                    const y01 = 0 + grassHeight;
 
                     // Add vertices for the grass blade triangles
                     positions.push(x0, y00, z0);
